@@ -1,54 +1,51 @@
-import { Component } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { ModalBackdropStyle } from "./Modal.styled";
 import { ReactComponent as CloseIcon } from "../../icon/close.svg";
 import PropTypes from 'prop-types';
 
-
 const modalRoot = document.querySelector('#modal-root');
 
-export class Modal extends Component {
-    static propTypes = {
-      url: PropTypes.string.isRequired,
-      onClose: PropTypes.func.isRequired,
-    };
-  
-    componentDidMount() {
-      window.addEventListener('keydown', this.clickEsc);
-    }
-    componentWillUnmount() {
-      window.removeEventListener('keydown', this.clickEsc);
-    }
-    
-    handleCloseClick = () => {
-        this.props.onClose();
+const Modal = ({ url, onClose }) => {
+    const handleCloseClick = () => {
+        onClose();
     };
 
-    clickBackdrop = event => {
-      if (event.target === event.currentTarget) {
-        this.props.onClose();
-      }
-    };
-  
-    clickEsc = event => {
-      if (event.code === 'Escape') {
-        this.props.onClose();
-      }
+    const clickBackdrop = event => {
+        if (event.target === event.currentTarget) {
+            onClose();
+        }
     };
 
-    render() {
-        return createPortal(
-            <ModalBackdropStyle onClick={this.clickBackdrop}>
-                <div className="modal">
-                    <button type="button" className="close-btn" onClick={this.handleCloseClick}>
-                        <CloseIcon className="close-icon" width="40" height="40"/>
-                    </button>
-                    <img src={this.props.url} alt={this.props.tags} />
-                    
-                </div>
-            </ModalBackdropStyle>,
-            modalRoot
-        )
+    const clickEsc = event => {
+        if (event.code === 'Escape') {
+            onClose();
+        }
     };
+
+    useEffect(() => {
+        window.addEventListener('keydown', clickEsc);
+        return () => {
+            window.removeEventListener('keydown', clickEsc);
+        };
+    }, [clickEsc]);
+
+    return createPortal(
+        <ModalBackdropStyle onClick={clickBackdrop}>
+            <div className="modal">
+                <button type="button" className="close-btn" onClick={handleCloseClick}>
+                    <CloseIcon className="close-icon" width="40" height="40" />
+                </button>
+                <img src={url} alt="modal" />
+            </div>
+        </ModalBackdropStyle>,
+        modalRoot
+    );
 };
 
+Modal.propTypes = {
+    url: PropTypes.string.isRequired,
+    onClose: PropTypes.func.isRequired,
+};
+
+export default Modal;
