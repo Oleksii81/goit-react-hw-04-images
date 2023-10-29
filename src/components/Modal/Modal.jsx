@@ -7,33 +7,30 @@ import PropTypes from 'prop-types';
 const modalRoot = document.querySelector('#modal-root');
 
 const Modal = ({ url, onClose }) => {
-    const handleCloseClick = () => {
-        onClose();
-    };
-
-    const clickBackdrop = event => {
-        if (event.target === event.currentTarget) {
-            onClose();
-        }
-    };
-
-    const clickEsc = event => {
-        if (event.code === 'Escape') {
-            onClose();
-        }
-    };
-
     useEffect(() => {
-        window.addEventListener('keydown', clickEsc);
-        return () => {
-            window.removeEventListener('keydown', clickEsc);
-        };
-    }, [clickEsc]);
+      const clickEsc = event => {
+        if (event.code === 'Escape') {
+          onClose();
+        }
+      };
+  
+      window.addEventListener('keydown', clickEsc);
+  
+      return () => {
+        window.removeEventListener('keydown', clickEsc);
+      };
+    }, [onClose]);
+  
+    const clickBackdrop = event => {
+      if (event.target === event.currentTarget) {
+        onClose();
+      }
+    };
 
     return createPortal(
         <ModalBackdropStyle onClick={clickBackdrop}>
             <div className="modal">
-                <button type="button" className="close-btn" onClick={handleCloseClick}>
+                <button type="button" className="close-btn" onClick={onClose}>
                     <CloseIcon className="close-icon" width="40" height="40" />
                 </button>
                 <img src={url} alt="modal" />
